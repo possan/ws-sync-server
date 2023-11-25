@@ -14,9 +14,9 @@ app.use(express.static("static"));
 var wss = appWithWS.getWss();
 
 function broadcast(message, channel) {
-  console.log("broadcast", channel, message);
+  // console.log("broadcast", channel, message);
   wss.clients.forEach(function (client) {
-    console.log("  client @channel ", client._channel);
+    // console.log("  client @channel ", client._channel);
     if (client._channel === channel) {
       client.send(message);
     }
@@ -27,6 +27,8 @@ app.ws("/broadcast", function (ws, req) {
   let nodeid = -1;
   let channel = "default";
   const id = uuid.v4();
+
+  console.log("connected", channel, id);
 
   ws._channel = channel;
 
@@ -50,7 +52,7 @@ app.ws("/broadcast", function (ws, req) {
   });
 
   ws.on("close", () => {
-    console.log("disconnect", nodeid);
+    console.log("disconnect", channel, id, nodeid);
     broadcast(
       JSON.stringify({
         type: "disconnect",
@@ -68,6 +70,8 @@ app.ws("/broadcast/:channel", function (ws, req) {
   let channel = req.params.channel;
   const id = uuid.v4();
 
+  console.log("connected", channel, id);
+
   ws._channel = channel;
 
   ws.send(
@@ -90,7 +94,7 @@ app.ws("/broadcast/:channel", function (ws, req) {
   });
 
   ws.on("close", () => {
-    console.log("disconnect", nodeid);
+    console.log("disconnect", channel, id, nodeid);
     broadcast(
       JSON.stringify({
         type: "disconnect",

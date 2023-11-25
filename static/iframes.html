@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .boxes {
+        display: flex;
+        flex-direction: row;
+        width: 100vw;
+        height: 100vh;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .boxes iframe {
+        flex: 1;
+        width: 30%;
+        height: 30%;
+        box-sizing: border-box;
+      }
+    </style>
+    <script>
+      function getChannelFromUrl() {
+        const hash = document.location.hash.substring(1);
+        const u = new URLSearchParams(`?${hash}`);
+        const channel = u.get("channel");
+        console.log("channel", channel);
+        return channel;
+      }
+
+      window.addEventListener("load", () => {
+        const channel = getChannelFromUrl() || "framedemo1";
+
+        console.log("channel", channel);
+        for (var k = 0; k < 9; k++) {
+          document
+            .getElementById(`fr${k}`)
+            .setAttribute("src", `demo.html#node=${k}&channel=${channel}`);
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div class="boxes">
+      <iframe id="fr0"></iframe>
+      <iframe id="fr1"></iframe>
+      <iframe id="fr2"></iframe>
+      <iframe id="fr3"></iframe>
+      <iframe id="fr4"></iframe>
+      <iframe id="fr5"></iframe>
+      <iframe id="fr6"></iframe>
+      <iframe id="fr7"></iframe>
+      <iframe id="fr8"></iframe>
+    </div>
+  </body>
+</html>

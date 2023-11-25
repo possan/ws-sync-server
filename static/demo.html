@@ -12,7 +12,9 @@
         position: relative;
         margin: 0;
         padding: 0;
+        box-sizing: border-box;
         font: 12px monospace;
+        overflow: hidden;
       }
 
       #demo div {
@@ -55,9 +57,29 @@
         cursor: pointer;
         color: #06f;
       }
+
+      .timebar {
+        width: 80%;
+        margin: 2px;
+        padding: 2px;
+
+        border: 1px solid #000;
+        box-sizing: border-box;
+      }
+
+      .timebar > div {
+        height: 10px;
+        background-color: #f00;
+      }
     </style>
   </head>
   <body>
+    <div class="timebar">
+      <div id="fill" style="width: 50%"></div>
+    </div>
+    <div class="timebar">
+      <div id="fill2" style="width: 50%"></div>
+    </div>
     <a id="reload">RELOAD</a>
     <p>DEMO NODE ID <span id="nodeid">?</span></p>
     <p>CONNECTION ID <span id="connectionid">?</span></p>

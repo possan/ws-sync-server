@@ -7,6 +7,9 @@ let lastmastertime;
 let lastsynctime;
 let channel;
 let connectionid;
+let clockelement;
+let fillelement;
+let fillelement2;
 
 function getChannelFromUrl() {
   const hash = document.location.hash.substring(1);
@@ -42,7 +45,7 @@ function handler(event) {
 
   if (event.type === "disconnect") {
     const el = elementForId[event.node];
-    if (el) {
+    if (el && el.parentNode) {
       el.parentNode.removeChild(el);
     }
   }
@@ -59,7 +62,7 @@ function handler(event) {
     el.style.top = `${event.y}px`;
   }
 
-  if (event.type === "clock") {
+  if (event.type === "localclock") {
     if (event.node === 0) {
       lastsynctime = Date.now();
       lastmastertime = event.time;
@@ -86,6 +89,10 @@ function load() {
   document.getElementById("nodeid").innerText = `${nodeid}`;
   document.getElementById("channel").innerText = `${channel}`;
 
+  clockelement = document.getElementById("clock");
+  fillelement = document.getElementById("fill");
+  fillelement2 = document.getElementById("fill2");
+
   window.addEventListener("mousemove", (e) => {
     sync.send({
       type: "mouse",
@@ -100,25 +107,40 @@ function load() {
   });
 
   setInterval(() => {
-    if (nodeid === 0) {
-      // send master clock data
-      sync.send({
-        type: "clock",
-        node: nodeid,
-        time: Date.now() - inittime,
-      });
-    }
+    sync.send({
+      type: "localclock",
+      node: nodeid,
+      time: Date.now() - inittime,
+    });
   }, 3000);
 
   setInterval(() => {
+    let reltime = 0;
     if (nodeid === 0) {
-      const localtime = Date.now() - inittime;
-      document.getElementById("clock").innerText = `M:${localtime}`;
+      reltime = Date.now() - inittime;
+      clockelement.innerText = `M:${reltime}`;
     } else {
-      const remotetime = Date.now() - lastsynctime + lastmastertime;
-      document.getElementById("clock").innerText = `S:${remotetime}`;
+      reltime = Date.now() - lastsynctime + lastmastertime;
+      clockelement.innerText = `S:${reltime}`;
     }
-  }, 50);
+  }, 100);
+
+  setInterval(() => {
+    let reltime = 0;
+    if (nodeid === 0) {
+      reltime = Date.now() - inittime;
+    } else {
+      reltime = Date.now() - lastsynctime + lastmastertime;
+    }
+    const pct = Math.round(((reltime % 1000) * 100) / 1000);
+    fillelement.style = `width:${pct}%;`;
+    if (reltime % 250 < 50) {
+      fillelement2.style = `width:100%;`;
+    } else {
+      fillelement2.style = `width:0%;`;
+    }
+    // const pct2 = Math.round(((reltime % 100) * 100) / 100);
+  }, 20);
 }
 
 window.addEventListener("load", load);

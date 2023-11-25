@@ -74,7 +74,12 @@ function load() {
   nodeid = getNodeIdFromUrl();
   channel = getChannelFromUrl();
 
-  sync = new SyncClient(`ws://localhost:3000/broadcast/${channel}`, nodeid);
+  const secure = location.protocol.indexOf("https") !== -1;
+
+  sync = new SyncClient(
+    `${secure ? "wss" : "ws"}://${location.host}/broadcast/${channel}`,
+    nodeid
+  );
   sync.subscribe(handler);
   sync.connect();
 

@@ -29,6 +29,11 @@ export class SyncClient {
       // console.log("message", e.data);
       if (e.data) {
         const j = JSON.parse(e.data);
+
+        if (j && j.type === "welcome") {
+          this.nodeid = j.id;
+        }
+
         this._fire(j);
       }
     });

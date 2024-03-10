@@ -1,0 +1,17 @@
+<h1>Midi receiver</h1>
+
+<p>Network channel: <span id="channel">Unknown</span></p>
+<p>Network device id: <span id="deviceid">Pending...</span></p>
+
+<p id="midiconnected" style="display: none">
+  Send midi to: <br />
+  <select id="mididevices" multiple size="10"></select>
+</p>
+
+<p id="mididisconnected">
+  <button id="enablemidi">Enable MIDI</button>
+</p>
+
+<p><span id="eventcount">0</span> events received</p>
+
+<script src="midireceiver.js" type="module"></script>

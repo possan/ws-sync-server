@@ -43,7 +43,7 @@ app.ws("/broadcast", function (ws, req) {
   ws.on("message", function (msg) {
     // console.log("got message", msg);
     const decoded = JSON.parse(msg);
-    if (decoded && decoded.type === "hello") {
+    if (decoded && decoded.type === "hello" && decoded.node) {
       nodeid = decoded.node;
     }
     decoded.channel = channel;

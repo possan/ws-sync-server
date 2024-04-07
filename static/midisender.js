@@ -8,10 +8,13 @@ let midi;
 let midiDeviceListElement;
 let selectedMidiDevices = [];
 let counter;
+let inputcounter;
 let countElement;
+let countElement2;
 let flagelement0;
 let flagelement1;
 let flagelement2;
+let flagelement3;
 
 function getChannelFromUrl() {
   const hash = document.location.hash.substring(1);
@@ -66,9 +69,20 @@ function getMIDINote(dataByte1LSB) {
 }
 
 function handleMidi(message) {
-  console.log("got midi", message.data);
-
   const arr = Array.from(message.data);
+  const cmd = (arr[0] & 0xf0) >> 4;
+
+  inputcounter++;
+  countElement2.textContent = `${inputcounter}`;
+
+  if ((mode & 8) !== 8) {
+    // We should NOT send realtime events..
+    if (cmd === 0xf) {
+      return;
+    }
+  }
+
+  console.log("got midi", cmd, message.data);
 
   if ((mode & 1) === 1) {
     // send regular
@@ -219,6 +233,7 @@ function updateModeFlags() {
   if (flagelement0.checked) mode += 1;
   if (flagelement1.checked) mode += 2;
   if (flagelement2.checked) mode += 4;
+  if (flagelement3.checked) mode += 8;
   console.log("flags", mode);
 
   location = `#channel=${channel}&mode=${mode}`;
@@ -252,19 +267,24 @@ function load() {
   sync.subscribe(handler);
   sync.connect();
 
+  inputcounter = 0;
   counter = 0;
   countElement = document.getElementById("eventcount");
+  countElement2 = document.getElementById("inputeventcount");
   midiDeviceListElement = document.getElementById("mididevices");
 
   flagelement0 = document.getElementById("modeflag0");
   flagelement1 = document.getElementById("modeflag1");
   flagelement2 = document.getElementById("modeflag2");
+  flagelement3 = document.getElementById("modeflag3");
   flagelement0.checked = (mode & 1) === 1;
   flagelement1.checked = (mode & 2) === 2;
   flagelement2.checked = (mode & 4) === 4;
+  flagelement3.checked = (mode & 8) === 8;
   flagelement0.addEventListener("click", updateModeFlags);
   flagelement1.addEventListener("click", updateModeFlags);
   flagelement2.addEventListener("click", updateModeFlags);
+  flagelement3.addEventListener("click", updateModeFlags);
 
   document.getElementById("enablemidi").addEventListener("click", enableMIDI);
   setTimeout(enableMIDI, 1000);

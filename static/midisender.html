@@ -24,13 +24,18 @@
 
   <label>
     <input type="checkbox" id="modeflag2" />(DEBUG) Send to deployed version
-    from localhost
+    from localhost </label
+  ><br />
+
+  <label>
+    <input type="checkbox" id="modeflag3" />Send realtime/clock events (0xF?)
   </label>
 </p>
 
 <p>
   Websocket URL: <code id="wsurl">...</code><br />
-  <span id="eventcount">0</span> events sent<br />
+  <span id="inputeventcount">0</span> midi events received<br />
+  <span id="eventcount">0</span> websocket events sent<br />
   average latency <span id="avglatency">0</span>ms
 </p>
 

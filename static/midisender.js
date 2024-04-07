@@ -19,11 +19,15 @@ function getChannelFromUrl() {
 }
 
 function handler(event) {
-  console.log("got event", event);
+  // console.log("got event", event);
 
   if (event.type === "welcome") {
     deviceid = event.id;
     document.getElementById("deviceid").innerText = `${deviceid}`;
+  }
+
+  if (event.type === ".averagelatency") {
+    document.getElementById("avglatency").textContent = `${event.value}`;
   }
 }
 

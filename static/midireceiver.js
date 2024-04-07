@@ -37,6 +37,10 @@ function handler(event) {
     counter++;
     countElement.textContent = `${counter}`;
   }
+
+  if (event.type === ".averagelatency") {
+    document.getElementById("avglatency").textContent = `${event.value}`;
+  }
 }
 
 function updateMidiConnections() {

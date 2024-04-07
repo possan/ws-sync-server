@@ -20,7 +20,7 @@ export class SyncClient {
     this.send({
       type: ".latencyprobe",
       key: key,
-      start: Date.now(),
+      start: typeof performance !== undefined ? performance.now() : Date.now(),
     });
   }
 
@@ -36,7 +36,8 @@ export class SyncClient {
   }
 
   _handleLatencyProbe(m) {
-    const now = Date.now();
+    const now =
+      typeof performance !== undefined ? performance.now() : Date.now();
     const roundtrip = now - m.start;
     // console.log("got latency probe response", m, roundtrip);
     this._latencies.push(roundtrip);

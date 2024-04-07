@@ -39,7 +39,8 @@ function handler(event) {
   }
 
   if (event.type === ".averagelatency") {
-    document.getElementById("avglatency").textContent = `${event.value}`;
+    document.getElementById("avglatency").textContent =
+      Math.round(event.value * 10000) / 10000;
   }
 }
 

@@ -1,7 +1,6 @@
 import { SyncClient } from "./client.js";
 
 let sync;
-let inittime;
 let channel;
 let deviceid;
 let midi;
@@ -27,7 +26,8 @@ function handler(event) {
   }
 
   if (event.type === ".averagelatency") {
-    document.getElementById("avglatency").textContent = `${event.value}`;
+    document.getElementById("avglatency").textContent =
+      Math.round(event.value * 10000) / 10000;
   }
 }
 
@@ -104,7 +104,6 @@ async function enableMIDI() {
 function load() {
   console.log("window loaded");
 
-  inittime = Date.now();
   channel = getChannelFromUrl();
 
   const sel = localStorage.getItem("selectedmidiinputs") ?? "";

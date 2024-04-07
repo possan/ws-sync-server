@@ -36,6 +36,10 @@ export class SyncClient {
   }
 
   _handleLatencyProbe(m) {
+    if (this._latencykeys.indexOf(m.key) === -1) {
+      // skipping someone elses probe
+      return;
+    }
     const now =
       typeof performance !== undefined ? performance.now() : Date.now();
     const roundtrip = now - m.start;
@@ -76,7 +80,7 @@ export class SyncClient {
       if (e.data) {
         const j = JSON.parse(e.data);
 
-        if (j && j.type === "welcome") {
+        if (j && j.type === ".welcome") {
           this.nodeid = j.id;
         }
 

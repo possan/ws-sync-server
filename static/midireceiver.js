@@ -18,12 +18,10 @@ function getChannelFromUrl() {
 }
 
 function handler(event) {
-  if (event.type === "welcome") {
+  if (event.type === ".welcome") {
     deviceid = event.id;
     document.getElementById("deviceid").innerText = `${deviceid}`;
-  }
-
-  if (event.type === "midi") {
+  } else if (event.type === "midi") {
     console.log("got midi event", event, selectedMidiDevices);
 
     for (const [id, outp] of midi.outputs) {
@@ -36,11 +34,11 @@ function handler(event) {
 
     counter++;
     countElement.textContent = `${counter}`;
-  }
-
-  if (event.type === ".averagelatency") {
+  } else if (event.type === ".averagelatency") {
     document.getElementById("avglatency").textContent =
       Math.round(event.value * 10000) / 10000;
+  } else {
+    console.log("got unhandled event", event);
   }
 }
 
@@ -98,7 +96,9 @@ async function enableMIDI() {
 
 function load() {
   console.log("window loaded");
+
   channel = getChannelFromUrl();
+  document.getElementById("channel").innerText = `${channel}`;
 
   const sel = localStorage.getItem("selectedmidioutputs") ?? "";
   selectedMidiDevices = [];
@@ -108,15 +108,14 @@ function load() {
   console.log("initial selection", selectedMidiDevices);
 
   const secure = location.protocol.indexOf("https") !== -1;
+  const wsurl = `${secure ? "wss" : "ws"}://${
+    location.host
+  }/broadcast/${channel}`;
+  document.getElementById("wsurl").innerText = wsurl;
 
-  sync = new SyncClient(
-    `${secure ? "wss" : "ws"}://${location.host}/broadcast/${channel}`,
-    undefined
-  );
+  sync = new SyncClient(wsurl, undefined);
   sync.subscribe(handler);
   sync.connect();
-
-  document.getElementById("channel").innerText = `${channel}`;
 
   counter = 0;
   countElement = document.getElementById("eventcount");

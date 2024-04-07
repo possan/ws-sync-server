@@ -34,20 +34,20 @@ app.ws("/broadcast", function (ws, req) {
 
   ws.send(
     JSON.stringify({
-      type: "welcome",
-      channel,
-      id,
+      type: "_welcome",
+      _channel: channel,
+      _id: id,
     })
   );
 
   ws.on("message", function (msg) {
     // console.log("got message", msg);
     const decoded = JSON.parse(msg);
-    if (decoded && decoded.type === "hello" && decoded.node) {
+    if (decoded && decoded.type === ".hello" && decoded.node) {
       nodeid = decoded.node;
     }
-    decoded.channel = channel;
-    decoded.id = id;
+    decoded._channel = channel;
+    decoded._id = id;
     broadcast(JSON.stringify(decoded), channel);
   });
 
@@ -55,10 +55,10 @@ app.ws("/broadcast", function (ws, req) {
     console.log("disconnect", channel, id, nodeid);
     broadcast(
       JSON.stringify({
-        type: "disconnect",
-        node: nodeid,
-        channel,
-        id,
+        type: ".disconnect",
+        _node: nodeid,
+        _channel: channel,
+        _id: id,
       }),
       channel
     );
@@ -76,20 +76,20 @@ app.ws("/broadcast/:channel", function (ws, req) {
 
   ws.send(
     JSON.stringify({
-      type: "welcome",
-      channel,
-      id,
+      type: ".welcome",
+      _channel: channel,
+      _id: id,
     })
   );
 
   ws.on("message", function (msg) {
     // console.log("got message", msg);
     const decoded = JSON.parse(msg);
-    if (decoded && decoded.type === "hello") {
+    if (decoded && decoded.type === ".hello") {
       nodeid = decoded.node;
     }
-    decoded.channel = channel;
-    decoded.id = id;
+    decoded._channel = channel;
+    decoded._id = id;
     broadcast(JSON.stringify(decoded), channel);
   });
 
@@ -97,10 +97,10 @@ app.ws("/broadcast/:channel", function (ws, req) {
     console.log("disconnect", channel, id, nodeid);
     broadcast(
       JSON.stringify({
-        type: "disconnect",
-        node: nodeid,
-        channel,
-        id,
+        type: ".disconnect",
+        _node: nodeid,
+        _channel: channel,
+        _id: id,
       }),
       channel
     );

@@ -12,7 +12,26 @@
   <button id="enablemidi">Enable MIDI</button>
 </p>
 
-<p><span id="eventcount">0</span> events sent</p>
-<p>average latency <span id="avglatency">0</span>ms</p>
+<p>
+  <label>
+    <input type="checkbox" id="modeflag0" />Send events for midi receiver
+    page</label
+  ><br />
+
+  <label>
+    <input type="checkbox" id="modeflag1" />Send events for cables.gl</label
+  ><br />
+
+  <label>
+    <input type="checkbox" id="modeflag2" />(DEBUG) Send to deployed version
+    from localhost
+  </label>
+</p>
+
+<p>
+  Websocket URL: <code id="wsurl">...</code><br />
+  <span id="eventcount">0</span> events sent<br />
+  average latency <span id="avglatency">0</span>ms
+</p>
 
 <script src="midisender.js" type="module"></script>

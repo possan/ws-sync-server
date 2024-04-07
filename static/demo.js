@@ -34,16 +34,16 @@ const elementForId = {};
 function handler(event) {
   //   console.log("got event", event);
 
-  if (event.type === "welcome") {
+  if (event.type === ".welcome") {
     connectionid = event.id;
     document.getElementById("connectionid").innerText = `${connectionid}`;
   }
 
-  if (event.type === "hello") {
+  if (event.type === ".hello") {
     // const el = document.createElement()
   }
 
-  if (event.type === "disconnect") {
+  if (event.type === ".disconnect") {
     const el = elementForId[event.node];
     if (el && el.parentNode) {
       el.parentNode.removeChild(el);

@@ -2,12 +2,16 @@ import { SyncClient } from "./client.js";
 
 let sync;
 let channel;
+let mode = 1;
 let deviceid;
 let midi;
 let midiDeviceListElement;
 let selectedMidiDevices = [];
 let counter;
 let countElement;
+let flagelement0;
+let flagelement1;
+let flagelement2;
 
 function getChannelFromUrl() {
   const hash = document.location.hash.substring(1);
@@ -17,10 +21,18 @@ function getChannelFromUrl() {
   return channel;
 }
 
+function getModeFromUrl() {
+  const hash = document.location.hash.substring(1);
+  const u = new URLSearchParams(`?${hash}`);
+  const mode = u.get("mode") ?? 1;
+  console.log("mode", mode);
+  return mode;
+}
+
 function handler(event) {
   // console.log("got event", event);
 
-  if (event.type === "welcome") {
+  if (event.type === ".welcome") {
     deviceid = event.id;
     document.getElementById("deviceid").innerText = `${deviceid}`;
   }
@@ -31,13 +43,114 @@ function handler(event) {
   }
 }
 
+const NOTE_VALUES = [
+  "C",
+  "C#",
+  "D",
+  "D#",
+  "E",
+  "F",
+  "F#",
+  "G",
+  "G#",
+  "A",
+  "A#",
+  "B",
+];
+function getMIDINote(dataByte1LSB) {
+  return dataByte1LSB <= 126
+    ? `${NOTE_VALUES[dataByte1LSB % 12]}${
+        Math.floor(dataByte1LSB / 12) - 2
+      } - ${dataByte1LSB}`
+    : "NO NOTE";
+}
+
 function handleMidi(message) {
-  // console.log("got midi", message.data);
-  sync.send({
-    type: "midi",
-    node: deviceid,
-    data: Array.from(message.data),
-  });
+  console.log("got midi", message.data);
+
+  const arr = Array.from(message.data);
+
+  if ((mode & 1) === 1) {
+    // send regular
+    sync.send({
+      type: "midi",
+      node: deviceid,
+      data: arr,
+    });
+  }
+
+  if ((mode & 2) === 2) {
+    // send as cables.gl
+    const cableformat = {};
+
+    cableformat.channel = arr[0] & 0x0f;
+    cableformat.cmd = (arr[0] & 0xf0) >> 4;
+
+    // {
+    //   "deviceName": "Loopback Bus 2",
+    //   "inputId": 0,
+    //   "messageType": "Note",
+    //   "index": 28,
+    //   "value": 0,
+    //   "cmd": 8,
+    //   "channel": 0,
+    //   "type": 128,
+    //   "note": 28,
+    //   "velocity": 0,
+    //   "data": {
+    //       "0": 128,
+    //       "1": 28,
+    //       "2": 0
+    //   },
+    //   "newNote": [
+    //       28,
+    //       "E0 - 28"
+    //   ]
+    // }
+
+    // {
+    //   "deviceName": "Loopback Bus 2",
+    //   "inputId": 0,
+    //   "messageType": "CC",
+    //   "index": 31,
+    //   "value": 61,
+    //   "cmd": 11,
+    //   "channel": 0,
+    //   "type": 176,
+    //   "note": 31,
+    //   "velocity": 61,
+    //   "data": {
+    //       "0": 176,
+    //       "1": 31,
+    //       "2": 61
+    //   }
+    // }
+
+    cableformat.type = arr[0];
+    cableformat.data = [];
+    cableformat.note = arr[1];
+    cableformat.index = arr[1];
+    cableformat.velocity = arr[2];
+    cableformat.value = arr[2];
+
+    if (cableformat.cmd === 0x8 || cableformat.cmd === 0x9) {
+      cableformat.messageType = "Note";
+      cableformat.data = arr;
+      cableformat.newNote = [cableformat.note, getMIDINote(cableformat.note)];
+    }
+
+    if (cableformat.cmd === 0xb) {
+      cableformat.messageType = "CC";
+      cableformat.data = arr;
+    }
+
+    console.log("cables format", cableformat);
+
+    if (cableformat.messageType) {
+      sync.send(cableformat);
+    }
+  }
+
   counter++;
   countElement.textContent = `${counter}`;
 }
@@ -101,10 +214,23 @@ async function enableMIDI() {
   });
 }
 
+function updateModeFlags() {
+  mode = 0;
+  if (flagelement0.checked) mode += 1;
+  if (flagelement1.checked) mode += 2;
+  if (flagelement2.checked) mode += 4;
+  console.log("flags", mode);
+
+  location = `#channel=${channel}&mode=${mode}`;
+}
+
 function load() {
   console.log("window loaded");
 
+  mode = getModeFromUrl();
+
   channel = getChannelFromUrl();
+  document.getElementById("channel").innerText = `${channel}`;
 
   const sel = localStorage.getItem("selectedmidiinputs") ?? "";
   selectedMidiDevices = [];
@@ -114,18 +240,31 @@ function load() {
   console.log("initial selection", selectedMidiDevices);
 
   const secure = location.protocol.indexOf("https") !== -1;
-  sync = new SyncClient(
-    `${secure ? "wss" : "ws"}://${location.host}/broadcast/${channel}`,
-    undefined
-  );
+  let wsurl = `${secure ? "wss" : "ws"}://${
+    location.host
+  }/broadcast/${channel}`;
+  if ((mode & 4) === 4) {
+    wsurl = `wss://sync.hemma.possan.codes/broadcast/${channel}`;
+  }
+  document.getElementById("wsurl").innerText = wsurl;
+
+  sync = new SyncClient(wsurl, undefined);
   sync.subscribe(handler);
   sync.connect();
-
-  document.getElementById("channel").innerText = `${channel}`;
 
   counter = 0;
   countElement = document.getElementById("eventcount");
   midiDeviceListElement = document.getElementById("mididevices");
+
+  flagelement0 = document.getElementById("modeflag0");
+  flagelement1 = document.getElementById("modeflag1");
+  flagelement2 = document.getElementById("modeflag2");
+  flagelement0.checked = (mode & 1) === 1;
+  flagelement1.checked = (mode & 2) === 2;
+  flagelement2.checked = (mode & 4) === 4;
+  flagelement0.addEventListener("click", updateModeFlags);
+  flagelement1.addEventListener("click", updateModeFlags);
+  flagelement2.addEventListener("click", updateModeFlags);
 
   document.getElementById("enablemidi").addEventListener("click", enableMIDI);
   setTimeout(enableMIDI, 1000);

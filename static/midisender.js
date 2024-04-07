@@ -33,7 +33,7 @@ function handler(event) {
   // console.log("got event", event);
 
   if (event.type === ".welcome") {
-    deviceid = event.id;
+    deviceid = event._id;
     document.getElementById("deviceid").innerText = `${deviceid}`;
   }
 

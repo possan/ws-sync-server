@@ -35,7 +35,7 @@ function handler(event) {
   //   console.log("got event", event);
 
   if (event.type === ".welcome") {
-    connectionid = event.id;
+    connectionid = event._id;
     document.getElementById("connectionid").innerText = `${connectionid}`;
   }
 

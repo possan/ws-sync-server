@@ -19,7 +19,7 @@ function getChannelFromUrl() {
 
 function handler(event) {
   if (event.type === ".welcome") {
-    deviceid = event.id;
+    deviceid = event._id;
     document.getElementById("deviceid").innerText = `${deviceid}`;
   } else if (event.type === "midi") {
     console.log("got midi event", event, selectedMidiDevices);

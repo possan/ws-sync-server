@@ -37,6 +37,12 @@ function handler(event) {
   } else if (event.type === ".averagelatency") {
     document.getElementById("avglatency").textContent =
       Math.round(event.value * 10000) / 10000;
+  } else if (event.type === ".stats") {
+    document.getElementById("lastmetrics").value = JSON.stringify(
+      event,
+      null,
+      2
+    );
   } else {
     console.log("got unhandled event", event);
   }

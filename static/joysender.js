@@ -42,6 +42,14 @@ function handler(event) {
     document.getElementById("avglatency").textContent =
       Math.round(event.value * 10000) / 10000;
   }
+
+  if (event.type === ".stats") {
+    document.getElementById("lastmetrics").value = JSON.stringify(
+      event,
+      null,
+      2
+    );
+  }
 }
 
 const NOTE_VALUES = [

@@ -1,0 +1,32 @@
+<h1>Joystick sender</h1>
+
+<p>Network channel: <span id="channel">Unknown</span></p>
+<p>Network device id: <span id="deviceid">Pending...</span></p>
+
+<p id="joyconnected" style="display: none">
+  Joystick state: <br />
+  <textarea
+    id="joystickstate"
+    rows="30"
+    style="width: 80%; font-size: 0.6rem"
+  ></textarea>
+</p>
+
+<p>
+  <label>
+    <input type="checkbox" id="modeflag0" />Send events for cables.gl</label
+  ><br />
+  <label>
+    <input type="checkbox" id="modeflag1" />(DEBUG) Send to deployed version
+    from localhost </label
+  ><br />
+</p>
+
+<p>
+  Websocket URL: <code id="wsurl">...</code><br />
+  <span id="inputeventcount">0</span> joystick events received<br />
+  <span id="eventcount">0</span> websocket events sent<br />
+  average latency <span id="avglatency">0</span>ms
+</p>
+
+<script src="joysender.js" type="module"></script>
